@@ -17,38 +17,55 @@ export const getDefaultJVMArguments = (
         ['Dfml.ignorePatchDiscrepancies']: true,
         ['Dfml.ignoreInvalidMinecraftCertificates']: true,
         ['Dterminal.ansi']: true,
-        ['Dterminal.jline']: false
+        ['Dterminal.jline']: false,
+        ['XX:+UnlockExperimentalVMOptions']: ''
     }
 
     let versionSpecificArguments = {}
 
-    if (javaVersion && javaVersion === 8) {
-        versionSpecificArguments = {
-            Xmn128M: '',
-            ['XX:+DisableExplicitGC']: '',
-            ['XX:+UseConcMarkSweepGC']: '',
-            ['XX:+UseParNewGC']: '',
-            ['XX:+UseNUMA']: '',
-            ['XX:+CMSParallelRemarkEnabled']: '',
-            ['XX:MaxTenuringThreshold']: 15,
-            ['XX:MaxGCPauseMillis']: 30,
-            ['XX:GCPauseIntervalMillis']: 150,
-            ['XX:+UseAdaptiveGCBoundary']: '',
-            ['XX:-UseGCOverheadLimit']: '',
-            ['XX:+UseBiasedLocking']: '',
-            ['XX:SurvivorRatio']: 8,
-            ['XX:TargetSurvivorRatio']: 90,
-            ['XX:+UseFastAccessorMethods']: '',
-            ['XX:+UseCompressedOops']: '',
-            ['XX:+OptimizeStringConcat']: '',
-            ['XX:+AggressiveOpts']: '',
-            ['XX:ReservedCodeCacheSize']: '2048m',
-            ['XX:+UseCodeCacheFlushing']: '',
-            ['XX:SoftRefLRUPolicyMSPerMB']: 10000,
-            ['XX:ParallelGCThreads']: 10,
-            ['XX:HeapDumpPath']:
-                'MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
-        }
+    switch (javaVersion) {
+        case 8:
+            versionSpecificArguments = {
+                Xmn128M: '',
+                ['XX:+DisableExplicitGC']: '',
+                ['XX:+UseConcMarkSweepGC']: '',
+                ['XX:+UseParNewGC']: '',
+                ['XX:+UseNUMA']: '',
+                ['XX:+CMSParallelRemarkEnabled']: '',
+                ['XX:MaxTenuringThreshold']: 15,
+                ['XX:MaxGCPauseMillis']: 30,
+                ['XX:GCPauseIntervalMillis']: 150,
+                ['XX:+UseAdaptiveGCBoundary']: '',
+                ['XX:-UseGCOverheadLimit']: '',
+                ['XX:+UseBiasedLocking']: '',
+                ['XX:SurvivorRatio']: 8,
+                ['XX:TargetSurvivorRatio']: 90,
+                ['XX:+UseFastAccessorMethods']: '',
+                ['XX:+UseCompressedOops']: '',
+                ['XX:+OptimizeStringConcat']: '',
+                ['XX:+AggressiveOpts']: '',
+                ['XX:ReservedCodeCacheSize']: '2048m',
+                ['XX:+UseCodeCacheFlushing']: '',
+                ['XX:SoftRefLRUPolicyMSPerMB']: 10000,
+                ['XX:ParallelGCThreads']: 10,
+                ['XX:HeapDumpPath']:
+                    'MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump',
+            }
+            break;
+        case 17:
+            versionSpecificArguments = {
+                Xmn128M: '',
+                'XX:+UseZGC': '',
+                'XX:+ParallelRefProcEnabled': '',
+                'XX:MaxGCPauseMillis': 200,
+                'XX:+DisableExplicitGC': '',
+                'XX:+AlwaysPreTouch': '',
+                'XX:InitiatingHeapOccupancyPercent': 15,
+                'XX:SurvivorRatio': 32,
+                'XX:+PerfDisableSharedMem': '',
+                'XX:MaxTenuringThreshold': ''
+            }
+            break;
     }
 
     return {

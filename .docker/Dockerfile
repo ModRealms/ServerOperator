@@ -39,4 +39,4 @@ COPY --from=install /opt/server/node_modules ./node_modules
 COPY --from=install /opt/server/package*.json .
 COPY --from=build /opt/server/dist ./dist
 
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/main.js"]
