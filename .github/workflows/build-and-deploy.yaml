@@ -31,3 +31,5 @@ jobs:
           push: true
           file: .docker/Dockerfile
           tags: ${{ vars.DOCKER_PRIVATE_REGISTRY }}/${{ env.REPO }}/server:${{ github.ref_name }}-jdk17
+        env:
+          JAVA_VERSION: 17
