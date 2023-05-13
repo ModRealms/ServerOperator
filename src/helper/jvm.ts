@@ -63,7 +63,7 @@ export const getDefaultJVMArguments = (
                 'XX:InitiatingHeapOccupancyPercent': 15,
                 'XX:SurvivorRatio': 32,
                 'XX:+PerfDisableSharedMem': '',
-                'XX:MaxTenuringThreshold': ''
+                'XX:MaxTenuringThreshold': 15
             }
             break;
     }
