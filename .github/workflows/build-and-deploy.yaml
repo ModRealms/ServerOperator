@@ -1,0 +1,33 @@
+name: Build and Push
+
+on:
+  push:
+    branches: [ 'develop', 'production' ]
+
+jobs:
+  build-jdk17:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to Image Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ vars.DOCKER_PRIVATE_REGISTRY }}
+          username: ${{ secrets.MAVEN_USERNAME }}
+          password: ${{ secrets.MAVEN_PASSWORD }}
+      - name: Create registry path
+        run: |
+          echo "REPO=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]')" >>${GITHUB_ENV}
+      - name: Build and Push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          file: .docker/Dockerfile
+          tags: ${{ vars.DOCKER_PRIVATE_REGISTRY }}/${{ env.REPO }}/server:${{ github.ref_name }}-jdk17
