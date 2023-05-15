@@ -17,7 +17,10 @@ import { runServerProcess } from './helper/process'
 const { app } = setupConfiguration()
 
 const operatorDir = ensureDirExists(`${app.serverPath}/.operator`)
+
 const javaVersion = getJavaVersion()
+sendMessage(`Running Java ${javaVersion}`)
+
 const jmxAuth = setupJMXAuth(app.docker.user, operatorDir, app.jmx)
 
 setupEULA(app.serverPath)
