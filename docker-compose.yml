@@ -9,7 +9,6 @@ services:
       context: .
       dockerfile: ./.docker/Dockerfile
     volumes:
-      - ./src:/opt/server/src
       - ./server:/home/container
     stdin_open: true
     tty: true

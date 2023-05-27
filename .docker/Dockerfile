@@ -1,42 +1,27 @@
-FROM node:16-bullseye-slim as install
+FROM node:18.16-alpine3.16 as builder
 
 # Setup Operator
-WORKDIR /opt/server
-COPY package*.json .
-RUN npm install
+WORKDIR /app
+COPY . .
+RUN npm install --production && \
+    npm install -g @vercel/ncc && \
+    ncc build src/main.ts -o dist
 
-FROM install as build
-
-WORKDIR /opt/server
-COPY --from=install /opt/server/node_modules ./node_modules
-COPY --from=install /opt/server/package*.json .
-COPY tsconfig.json .
-COPY src ./src
-RUN npm run build
-
-FROM node:16-bullseye-slim as java
+FROM node:18.16-alpine3.16
 
 ARG JAVA_VERSION
 
-# Install AdoptiumJDK
-RUN apt-get update && apt-get install -y wget apt-transport-https gnupg \
-    && wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | apt-key add - \
-    && echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list \
-    && apt-get update && apt-get install -y temurin-$JAVA_VERSION-jdk
-
-# Setup Pterodactyl Image Requirements
-RUN apt-get update && apt-get install -y curl ca-certificates openssl git tar bash sqlite3 fontconfig
+# Install AdoptiumJRE & Pterodactyl Image Requirements
+RUN wget -O /etc/apk/keys/adoptium.rsa.pub https://packages.adoptium.net/artifactory/api/security/keypair/public/repositories/apk && \ 
+    echo 'https://packages.adoptium.net/artifactory/apk/alpine/main' >> /etc/apk/repositories && \ 
+    apk add temurin-$JAVA_VERSION-jre curl openssl git tar bash sqlite fontconfig
 
 # Setup User
 RUN adduser --disabled-password --home /home/container container
-
-FROM java as run
-
 ENV USER=container HOME=/home/container
 
 WORKDIR /opt/server
-COPY --from=install /opt/server/node_modules ./node_modules
-COPY --from=install /opt/server/package*.json .
-COPY --from=build /opt/server/dist ./dist
+COPY --from=builder /app/dist/index.js .
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "index.js"]
+
